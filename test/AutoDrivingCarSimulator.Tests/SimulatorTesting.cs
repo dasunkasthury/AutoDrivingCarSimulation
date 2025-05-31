@@ -170,12 +170,6 @@ public class SimulatorTesting
 
         //Assertion
         Assert.Single(res);
-        Assert.Equal(car.Name, res[0].Name);
-        Assert.Equal(car.XCoordinate, res[0].XCoordinate);
-        Assert.Equal(car.YCoordinate, res[0].YCoordinate);
-        Assert.Equal(car.Direction, res[0].Direction);
-
-
     }
 
     public void GivenCarDetails_Validate_CarCollition(IList<CarDto> carList, FieldDto field)

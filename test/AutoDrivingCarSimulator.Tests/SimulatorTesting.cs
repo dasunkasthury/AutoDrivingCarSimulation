@@ -1,4 +1,5 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
+using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Services.Concretes;
 using AutoFixture.Xunit2;
 using FluentAssertions;
@@ -13,20 +14,53 @@ public class SimulatorTesting
         // Arrange
         var slut = new SimulatorService();
 
+        //Act
+        var res = slut.IsValidField(width, height);
+
+        //Assertion
+        res.Should().BeTrue("because the coordinates are within the defined field dimensions");
+    }
+
+    [Theory, InlineAutoData(0, 10)]
+    public void GivenInvalidFieldCoordinates_Validate_Coordinates(int width, int height)
+    {
+        // Arrange
+        var slut = new SimulatorService();
 
         //Act
         var res = slut.IsValidField(width, height);
 
+        //Assertion
+        res.Should().BeFalse("because this field has no width");
+    }
+
+    [Theory, InlineAutoData("A",0,2,Direction.W)]
+    public void GivenCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction Direction)
+    {
+        // Arrange
+        var car = new CarDto { Name= name, XCoordinate = xCord, YCoordinate = yCord, Direction = Direction }; 
+        var slut = new SimulatorService();
+
+        //Act
+        var res = slut.IsValidCar(car);
 
         //Assertion
-        res.Should().BeTrue("because the coordinates are within the defined field dimensions");
+        res.Should().BeTrue("because the car details are valid");
 
     }
 
-    [Theory, InlineAutoData(5, 10)]
-    public void GivenCarDetails_Validate_CarDetails(CarDto car)
+    [Theory, InlineAutoData("A", 0, -1, Direction.W)]
+    public void GivenInvalidCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction Direction)
     {
+        // Arrange
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = Direction };
+        var slut = new SimulatorService();
 
+        //Act
+        var res = slut.IsValidCar(car);
+
+        //Assertion
+        res.Should().BeFalse("because the car details are valid");
 
     }
 

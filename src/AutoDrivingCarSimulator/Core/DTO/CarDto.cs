@@ -2,7 +2,7 @@
 
 namespace AutoDrivingCarSimulator.Core.DTO
 {
-    public record CarDto
+    public record CarDto : CordinateDto
     {
         public required string Name { get; init; }
         public required Direction Direction { get; init; }

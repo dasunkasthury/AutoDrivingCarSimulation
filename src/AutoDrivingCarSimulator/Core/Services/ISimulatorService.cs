@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoDrivingCarSimulator.Core.DTO;
 
 namespace AutoDrivingCarSimulator.Core.Services
 {
@@ -10,5 +6,8 @@ namespace AutoDrivingCarSimulator.Core.Services
     {
         void AddField(int width, int height);
         bool IsValidField(int width, int height);
+        bool IsValidCar(CarDto car);
+        void AddCar(CarDto car);
+        bool IsValidCommand(string command);
     }
 }

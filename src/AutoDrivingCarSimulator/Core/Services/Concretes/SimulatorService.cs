@@ -23,6 +23,11 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
             _simulatorRepository.AddField(new FieldDto { Height = height, Width = width });
         }
 
+        public void FindDestination()
+        {
+            throw new NotImplementedException();
+        }
+
         public IList<CarDto> GetAllCars()
         {
             var existingCar = _simulatorRepository.GetAllCar();

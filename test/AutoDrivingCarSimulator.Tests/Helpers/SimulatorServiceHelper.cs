@@ -18,5 +18,10 @@ namespace AutoDrivingCarSimulator.Tests.Helpers
         {
             return new CarDto { Direction = direction, Name = name, XCoordinate = xCord, YCoordinate = yCord };
         }
+
+        public static CarDto GetCar(string name, int xCord, int yCord, Direction direction, string command)
+        {
+            return new CarDto { Direction = direction, Name = name, XCoordinate = xCord, YCoordinate = yCord, CommandList = command.Select(c => Enum.Parse<Command>(c.ToString())).ToList() };
+        }
     }
 }

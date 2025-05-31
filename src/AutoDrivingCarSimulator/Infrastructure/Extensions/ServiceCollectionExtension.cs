@@ -1,5 +1,7 @@
-﻿using AutoDrivingCarSimulator.Core.Services;
+﻿using AutoDrivingCarSimulator.Core.Interfaces;
+using AutoDrivingCarSimulator.Core.Services;
 using AutoDrivingCarSimulator.Core.Services.Concretes;
+using AutoDrivingCarSimulator.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoDrivingCarSimulator.Infrastructure.Extensions
@@ -10,6 +12,8 @@ namespace AutoDrivingCarSimulator.Infrastructure.Extensions
         {
             // Register repositories
             services.AddSingleton<ISimulatorService, SimulatorService>();
+            services.AddSingleton<ISimulatorRepository, SimulatorRepository>();
+            services.AddAutoMapper(typeof(Program));
 
             return services;
         }

@@ -9,5 +9,7 @@ namespace AutoDrivingCarSimulator.Core.Services
         bool IsValidCar(CarDto car);
         void AddCar(CarDto car);
         bool IsValidCommand(string command);
+        bool IsValidCarName(string name);
+        IList<CarDto> GetAllCars();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
+using AutoDrivingCarSimulator.Domain.Entity;
 
 namespace AutoDrivingCarSimulator.Core.Interfaces
 {

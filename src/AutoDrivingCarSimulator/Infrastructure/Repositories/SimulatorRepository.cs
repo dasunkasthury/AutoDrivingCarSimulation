@@ -37,7 +37,8 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public IList<CarDto> GetAllCar()
         {
-            throw new NotImplementedException();
+            var cars = _mapper.Map<List<CarDto>>(_cars);
+            return cars;
         }
 
         public IEnumerable<CarDto> GetCollidedCars()

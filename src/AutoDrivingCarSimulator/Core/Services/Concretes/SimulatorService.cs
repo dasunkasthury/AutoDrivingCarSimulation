@@ -25,13 +25,39 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
 
         public void FindDestination()
         {
-            throw new NotImplementedException();
+            var field = _simulatorRepository.GetField();
+
+            bool hasMoreCommands = true;
+            do
+            {
+                var carList = _simulatorRepository.GetAllCar();
+
+                foreach (var car in carList)
+                {
+                    _simulatorRepository.RunCommand(car, field);
+                }
+                hasMoreCommands = carList.Any(c => c.CommandList.Count > 0); // Check if any car has commands left
+
+            } while (hasMoreCommands);
         }
 
         public IList<CarDto> GetAllCars()
         {
             var existingCar = _simulatorRepository.GetAllCar();
             return existingCar;
+        }
+
+        public IEnumerable<string> GetResults()
+        {
+            IList<string> result = new List<string>();
+            var completedCarList = _simulatorRepository.GetCompletedCars();
+
+            foreach (var completedcar in completedCarList)
+            {
+                result.Add($"{completedcar.Name}, ({completedcar.XCoordinate},{completedcar.YCoordinate})  {completedcar.Direction}");
+            }
+
+            return result;
         }
 
         public bool IsValidCar(CarDto car)

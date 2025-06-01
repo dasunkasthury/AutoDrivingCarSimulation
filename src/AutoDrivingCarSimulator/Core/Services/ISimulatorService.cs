@@ -12,5 +12,6 @@ namespace AutoDrivingCarSimulator.Core.Services
         bool IsValidCarName(string name);
         IList<CarDto> GetAllCars();
         void FindDestination();
+        IEnumerable<string> GetResults();
     }
 }

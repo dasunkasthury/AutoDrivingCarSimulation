@@ -17,11 +17,23 @@ Begin();
 void Begin()
 {
     Console.WriteLine("Welcome to Auto Driving Car Simulation!");
-    Console.WriteLine("Please enter the width and height of the simulation field in x y format:");
+    bool isValidField = true;
+    int width = 0;  
+    int height = 0;
+    do
+    {
+        Console.WriteLine("Please enter the width and height of the simulation field in x y format:");
 
-    string[] coordinates = Console.ReadLine().Split(' ');
-    int width = int.Parse(coordinates[0]);
-    int height = int.Parse(coordinates[1]);
+        string[] coordinates = Console.ReadLine().Split(' ');
+        width = int.Parse(coordinates[0]);
+        height = int.Parse(coordinates[1]);
+        isValidField = simulationService.IsValidField(width, height);
+
+        if (!isValidField)
+        {
+            Console.WriteLine("You have entered invalid width and height ");
+        }
+    } while (!isValidField);
 
     // Initialize the simulation field
     simulationService.AddField(width, height);
@@ -32,8 +44,6 @@ void Begin()
         Console.WriteLine("Please choose from the following options:");
         Console.WriteLine("[1] Add a car to field");
         Console.WriteLine("[2] Run simulation");
-        Console.WriteLine("[Q] Quit");
-        Console.Write("> ");
 
         var input = Console.ReadLine()?.ToUpper();
 
@@ -41,6 +51,9 @@ void Begin()
         {
             case "1":
                 AddCar();
+                break;
+            case "2":
+                Simulate();
                 break;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
@@ -69,7 +82,6 @@ void AddCar()
             Console.WriteLine("You have entered an invalid name");
         }
     } while (!isValidName);
-
 
     do
     {
@@ -118,4 +130,26 @@ void AddCar()
     {
         Console.WriteLine($"- {c.Name}, ({c.XCoordinate},{c.YCoordinate}) {c.Direction}, {string.Join("", c.CommandList)}");
     }
+}
+
+void Simulate()
+{
+    Console.WriteLine("Your current list of cars are:");
+    foreach (var c in simulationService.GetAllCars())
+    {
+        Console.WriteLine($"- {c.Name}, ({c.XCoordinate},{c.YCoordinate}) {c.Direction}, {string.Join("", c.CommandList)}");
+    }
+
+    simulationService.FindDestination();
+
+    Console.WriteLine("After simulation, the result is:");
+    foreach (var result in simulationService.GetResults())
+    {
+        Console.WriteLine(result);
+    }
+
+    Console.WriteLine("Please choose from the following options:");
+    Console.WriteLine("[1] Start over");
+    Console.WriteLine("[2] Exit");
+
 }

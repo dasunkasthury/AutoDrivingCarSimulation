@@ -13,7 +13,7 @@ namespace AutoDrivingCarSimulator.Core.Interfaces
 
         void RunCommand(CarDto car, FieldDto field);
 
-        void CheckCollision(CarDto car);
+        void CheckCollision();
 
         IEnumerable<CarDto> GetCollidedCars();
 

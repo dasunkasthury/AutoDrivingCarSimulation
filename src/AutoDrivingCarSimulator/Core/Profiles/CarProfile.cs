@@ -13,7 +13,6 @@ namespace AutoDrivingCarSimulator.Core.Profiles
                 .ForMember(dest => dest.Command, opt => opt.MapFrom(src => string.Join("", src.CommandList)));
             CreateMap<EntityCar, CarDto>()
                 .ForMember(dest => dest.CommandList, opt => opt.MapFrom(src => src.Command.Select(c => Enum.Parse<Command>(c.ToString())).ToList()));
-            CreateMap<EntityField, FieldDto>().ReverseMap();
         }
     }
 }

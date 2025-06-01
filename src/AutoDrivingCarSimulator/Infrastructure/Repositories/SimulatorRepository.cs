@@ -9,6 +9,7 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
     {
         private readonly List<EntityCar> _cars = new(); // Fix for IDE0090: 'new' expression can be simplified
         private readonly IMapper _mapper;
+        private EntityField _field;
 
         public SimulatorRepository(IMapper mapper)
         {
@@ -22,10 +23,10 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public void AddField(FieldDto field)
         {
-            throw new NotImplementedException();
+            _field = _mapper.Map<EntityField>(field);
         }
 
-        public void CheckCollision(CarDto car)
+        public void CheckCollision()
         {
             throw new NotImplementedException();
         }
@@ -48,18 +49,18 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public IEnumerable<CarDto> GetCompletedCars()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<IEnumerable<CarDto>>(_cars.Where(c => !c.IsCollide));
         }
 
         public FieldDto GetField()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<FieldDto>(_field);
         }
 
         public void RunCommand(CarDto car, FieldDto field)
         {
             var selectedCar = _cars.FirstOrDefault(c => c.Name == car.Name);
-            if (selectedCar.Command.Length > 0 && !selectedCar.IsCollide)
+            if (selectedCar.Command.Length > 0 )
             {
                 var cmd = selectedCar.Command[0];
 

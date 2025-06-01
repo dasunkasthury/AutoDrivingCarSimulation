@@ -42,10 +42,10 @@ public class SimulatorTest
     }
 
     [Theory, InlineAutoData("A",0,2,Direction.W)]
-    public void GivenCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction Direction)
+    public void GivenCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction direction)
     {
         // Arrange
-        var car = new CarDto { Name= name, XCoordinate = xCord, YCoordinate = yCord, Direction = Direction };
+        var car = new CarDto { Name= name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
         var simulator = Substitute.For<ISimulatorRepository>();
         var slut = new SimulatorService(simulator);
 
@@ -58,10 +58,10 @@ public class SimulatorTest
     }
 
     [Theory, InlineAutoData("A", 0, -1, Direction.W)]
-    public void GivenInvalidCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction Direction)
+    public void GivenInvalidCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction direction)
     {
         // Arrange
-        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = Direction };
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
         var simulator = Substitute.For<ISimulatorRepository>();
         var slut = new SimulatorService(simulator);
 
@@ -134,12 +134,12 @@ public class SimulatorTest
     }
 
     [Theory, InlineAutoData("A", 0, 1, Direction.W)]
-    public void GivenAddNewCar_Validate_CarList(string name, int xCord, int yCord, Direction Direction)
+    public void GivenAddNewCar_Validate_CarList(string name, int xCord, int yCord, Direction direction)
     {
         // Arrange
-        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = Direction };
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
         var simulator = Substitute.For<ISimulatorRepository>();
-        simulator.GetAllCar().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, Direction) });
+        simulator.GetAllCar().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, direction) });
         var slut = new SimulatorService(simulator);
         slut.AddCar(car);
 
@@ -155,12 +155,12 @@ public class SimulatorTest
     }
 
     [Theory, InlineAutoData("A", 0, 1, Direction.W, "FFLLR", 10, 10)]
-    public void GivenCarDetails_Validate_CarDestination(string name, int xCord, int yCord, Direction Direction, string command, int fieldWidth, int fieldHeight)
+    public void GivenCarDetails_Validate_CarDestination(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
     {
         // Arrange
-        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = Direction };
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
         var simulator = Substitute.For<ISimulatorRepository>();
-        simulator.GetAllCar().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, Direction, command) });
+        simulator.GetAllCar().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, direction, command) });
         simulator.GetField().Returns(new FieldDto { Height = fieldHeight, Width = fieldWidth });
         var slut = new SimulatorService(simulator);
         slut.FindDestination();
@@ -170,6 +170,48 @@ public class SimulatorTest
 
         //Assertion
         Assert.Single(res);
+    }
+
+    [Theory]
+    [InlineAutoData("A", 0, 1, Direction.W, "FFLLR")]
+    [InlineAutoData("B", 5, 8, Direction.N, "FF")]
+    public void GivenFinalDestination_Validate_CompletedResults(string name, int xCord, int yCord, Direction direction, string command)
+    {
+        // Arrange
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
+        var simulator = Substitute.For<ISimulatorRepository>();
+        simulator.GetCompletedCars().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, direction, command, false) });
+
+        var slut = new SimulatorService(simulator);
+
+        //Act
+        var res = slut.GetResults();
+
+        //Assertion
+        res.Should().NotBeNull();
+        res.Should().HaveCount(1);
+        res.Should().Contain(x=>x.Equals($"{name}, ({xCord},{yCord})  {direction}"));
+    }
+
+    [Theory]
+    [InlineAutoData("A", 0, 1, Direction.W, "FFLLR")]
+    [InlineAutoData("A", 8, 0, Direction.S, "FF")]
+    public void GivenFinalDestination_Validate_CollidedResults(string name, int xCord, int yCord, Direction direction, string command)
+    {
+        // Arrange
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
+        var simulator = Substitute.For<ISimulatorRepository>();
+        simulator.GetCollidedCars().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, direction, command, true) });
+
+        var slut = new SimulatorService(simulator);
+
+        //Act
+        var res = slut.GetResults();
+
+        //Assertion
+        res.Should().NotBeNull();
+        res.Should().HaveCount(1);
+        res.Should().Contain(x => x.Equals($"{name}, collides with  at ({xCord},{yCord}) at step 0"));
     }
 
     public void GivenCarDetails_Validate_CarCollition(IList<CarDto> carList, FieldDto field)

@@ -152,8 +152,30 @@ namespace AutoDrivingCarSimulator.Tests
             var res = slut.GetCollidedCars();
 
             //Assertion
-            Assert.Single(res);
-            Assert.True(res.First().IsCollide);
+            res.Should().HaveCount(1);
+            res.First().IsCollide.Should().BeTrue();
+        }
+
+        [Theory, InlineAutoData("A", 5, 1, Direction.W, "F", 10, 10)]
+        public void GivenCarCommand_Validate_increaseStepCount(string name, int xCord, int yCord, Direction Direction, string command, int fieldWidth, int fieldHeight)
+        {
+            // Arrange
+            var car = SimulatorServiceHelper.GetCar(name, xCord, yCord, Direction, command, false);
+            var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<CarProfile>());
+            var mapper = config.CreateMapper();
+
+            var slut = new SimulatorRepository(mapper);
+            slut.AddCar(car);
+
+            //Act
+            slut.RunCommand(car, field);
+            var res = slut.GetAllCar();
+
+            //Assertion
+            res.Should().HaveCount(1);
+            res.First().CompletedSteps.Should().Be(1);
         }
     }
 }

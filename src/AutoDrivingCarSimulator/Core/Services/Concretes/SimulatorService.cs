@@ -52,6 +52,16 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
         {
             IList<string> result = new List<string>();
             var completedCarList = _simulatorRepository.GetCompletedCars();
+            var collidedCarList = _simulatorRepository.GetCollidedCars();
+
+            if (collidedCarList.Any())
+            {
+                foreach (var collidedcar in collidedCarList)
+                {
+                    result.Add($"{collidedcar.Name}, collides with {string.Join(", ", collidedCarList.Where(c => c.Name != collidedcar.Name).Select(c => c.Name))} at ({collidedcar.XCoordinate},{collidedcar.YCoordinate}) at step {collidedcar.CompletedSteps}");
+                }
+
+            }
 
             foreach (var completedcar in completedCarList)
             {

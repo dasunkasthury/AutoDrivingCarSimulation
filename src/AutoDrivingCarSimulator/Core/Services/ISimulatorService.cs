@@ -11,7 +11,9 @@ namespace AutoDrivingCarSimulator.Core.Services
         bool IsValidCommand(string command);
         bool IsValidCarName(string name);
         IList<CarDto> GetAllCars();
-        void FindDestination();
+        void UpdateDestination();
         IEnumerable<string> GetResults();
+        void reset();
+        bool IsAnyCarAvailable();
     }
 }

@@ -28,7 +28,8 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public void ClearData()
         {
-            throw new NotImplementedException();
+            _cars.Clear();
+            _field = new EntityField { }; // Reset the field to null
         }
 
         public IList<CarDto> GetAllCar()

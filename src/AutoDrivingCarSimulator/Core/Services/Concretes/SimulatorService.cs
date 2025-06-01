@@ -1,4 +1,5 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
+using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Interfaces;
 using AutoDrivingCarSimulator.Domain.Entity;
 
@@ -63,7 +64,7 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
         }
 
 
-        public void FindDestination()
+        public void UpdateDestination()
         {
             var field = _simulatorRepository.GetField();
             var carList = _simulatorRepository.GetAllCarEntities();
@@ -132,6 +133,16 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
         public bool IsValidField(int width, int height)
         {
             return width > 0 && height > 0;
+        }
+
+        public void reset()
+        {
+            _simulatorRepository.ClearData();
+        }
+
+        public bool IsAnyCarAvailable()
+        {
+           return _simulatorRepository.GetAllCar().Any();
         }
     }
 }

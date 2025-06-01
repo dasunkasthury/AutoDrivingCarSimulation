@@ -1,6 +1,7 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
 using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Services;
+using AutoDrivingCarSimulator.Core.Services.Concretes;
 
 namespace AutoDrivingCarSimulator
 {
@@ -23,11 +24,15 @@ namespace AutoDrivingCarSimulator
                 Console.WriteLine("Please enter the width and height of the simulation field in x y format:");
 
                 string[] coordinates = Console.ReadLine().Split(' ');
-                width = int.Parse(coordinates[0]);
-                height = int.Parse(coordinates[1]);
-                isValidField = _simulatorService.IsValidField(width, height);
+                isValidField = coordinates.Length == 2;
+                if (isValidField) 
+                {
+                    width = int.Parse(coordinates[0]);
+                    height = int.Parse(coordinates[1]);
+                    isValidField = _simulatorService.IsValidField(width, height);
+                }
 
-                if (!isValidField)
+                else
                 {
                     Console.WriteLine("You have entered invalid width and height ");
                 }
@@ -69,7 +74,7 @@ namespace AutoDrivingCarSimulator
             string name = "";
             bool isValidCar = true;
             bool isValidCommand = true;
-            CarDto car;
+            CarDto car = new CarDto { Direction= Direction.E, Name = "", XCoordinate=0, YCoordinate =0 };
 
             do
             {
@@ -80,7 +85,7 @@ namespace AutoDrivingCarSimulator
 
                 if (!isValidName)
                 {
-                    Console.WriteLine("You have entered an invalid name");
+                    Console.WriteLine("You have entered an invalid or existing car name");
                 }
             } while (!isValidName);
 
@@ -88,21 +93,30 @@ namespace AutoDrivingCarSimulator
             {
                 Console.WriteLine($"Please enter initial position of car {name} in x y Direction format:");
                 string[] position = Console.ReadLine().Split(' ');
-                int x = int.Parse(position[0]);
-                int y = int.Parse(position[1]);
-                Direction direction = Enum.Parse<Direction>(position[2]);
+                isValidCar = position.Length == 3;
 
-                car = new CarDto()
+                if (isValidCar) 
                 {
-                    Name = name,
-                    XCoordinate = x,
-                    YCoordinate = y,
-                    Direction = direction
-                };
+                    int x = int.Parse(position[0]);
+                    int y = int.Parse(position[1]);
+                    //string dir = Enum.Parse<Direction>(position[2]);
 
-                isValidCar = _simulatorService.IsValidCar(car);
+                    isValidCar = Enum.IsDefined(typeof(Direction), (position[2]));
+                    if (!isValidCar)
+                    {
+                        Console.WriteLine("You have entered an invalid car direction");
+                        continue;
+                    } 
 
-                if (!isValidCar)
+                    car = new CarDto()
+                    {
+                        Name = name,
+                        XCoordinate = x,
+                        YCoordinate = y,
+                        Direction = Enum.Parse<Direction>(position[2])
+                    };
+                    isValidCar = _simulatorService.IsValidCar(car);
+                } else
                 {
                     Console.WriteLine("You have entered an invalid car details");
                 }
@@ -115,12 +129,13 @@ namespace AutoDrivingCarSimulator
 
                 isValidCommand = _simulatorService.IsValidCommand(command.ToUpper());
 
-                car.CommandList = command.ToUpper().Select(c => Enum.Parse<Command>(c.ToString())).ToList();
-
-                if (!isValidCommand)
+                if (!isValidCommand) 
                 {
                     Console.WriteLine("You have entered an invalid command");
+                    continue;
                 }
+
+                car.CommandList = command.ToUpper().Select(c => Enum.Parse<Command>(c.ToString())).ToList();
 
             } while (!isValidCommand);
 
@@ -135,13 +150,19 @@ namespace AutoDrivingCarSimulator
 
         void Simulate()
         {
+            if (!_simulatorService.IsAnyCarAvailable()) 
+            {
+                Console.WriteLine("Please enter at least one car befor run simulation");
+                Begin();
+            }
+
             Console.WriteLine("Your current list of cars are:");
             foreach (var c in _simulatorService.GetAllCars())
             {
                 Console.WriteLine($"- {c.Name}, ({c.XCoordinate},{c.YCoordinate}) {c.Direction}, {string.Join("", c.CommandList)}");
             }
 
-            _simulatorService.FindDestination();
+            _simulatorService.UpdateDestination();
 
             Console.WriteLine("After simulation, the result is:");
             foreach (var result in _simulatorService.GetResults())
@@ -152,6 +173,19 @@ namespace AutoDrivingCarSimulator
             Console.WriteLine("Please choose from the following options:");
             Console.WriteLine("[1] Start over");
             Console.WriteLine("[2] Exit");
+
+            string userOption = Console.ReadLine();
+            if (userOption == "1")
+            {
+                _simulatorService.reset(); // Reset the simulation
+                Begin(); // Restart the simulation
+                return;
+            }
+            else if (userOption == "2")
+            {
+                Quit();
+                return;
+            }
 
         }
 

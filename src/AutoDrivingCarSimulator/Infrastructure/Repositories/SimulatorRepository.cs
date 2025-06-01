@@ -52,7 +52,7 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public IEnumerable<CarDto> GetCollidedCars()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<IEnumerable<CarDto>>(_cars.Where(c => c.IsCollide));
         }
 
         public IEnumerable<CarDto> GetCompletedCars()

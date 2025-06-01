@@ -34,9 +34,10 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
 
                 foreach (var car in carList)
                 {
-                    _simulatorRepository.RunCommand(car, field);
+                    _simulatorRepository.RunCommand(car, field); // to execute the commands one by one to earch car
+                    _simulatorRepository.CheckCollision(); // Check for collisions before running next commands
                 }
-                hasMoreCommands = carList.Any(c => c.CommandList.Count > 0); // Check if any car has commands left
+                hasMoreCommands = carList.Any(c => c.CommandList.Count > 0 && !c.IsCollide); // Check if any car which is not collided and has commands left
 
             } while (hasMoreCommands);
         }

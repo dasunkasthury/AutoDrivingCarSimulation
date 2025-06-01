@@ -55,6 +55,9 @@ void Begin()
             case "2":
                 Simulate();
                 break;
+            case "Q" or "q":
+                Quit();
+                return;
             default:
                 Console.WriteLine("Invalid option. Please try again.");
                 break;
@@ -152,4 +155,9 @@ void Simulate()
     Console.WriteLine("[1] Start over");
     Console.WriteLine("[2] Exit");
 
+}
+
+void Quit()
+{
+    Console.WriteLine("Thank you for running the simulation. Goodbye!");
 }

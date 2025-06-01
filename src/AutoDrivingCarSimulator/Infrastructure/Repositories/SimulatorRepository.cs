@@ -28,7 +28,15 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public void CheckCollision()
         {
-            throw new NotImplementedException();
+            var isCollideCar = _cars.GroupBy(c => new { c.YCoordinate, c.XCoordinate }).Where(g => g.Count() > 1).Select(c => c.Key).ToList();
+
+            if (isCollideCar.Any())
+            {
+                foreach (var collideCar in _cars.Where(c => c.YCoordinate == isCollideCar[0].YCoordinate && c.XCoordinate == isCollideCar[0].XCoordinate).ToList())
+                {
+                    collideCar.IsCollide = true;
+                }
+            }
         }
 
         public void ClearData()
@@ -60,7 +68,7 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
         public void RunCommand(CarDto car, FieldDto field)
         {
             var selectedCar = _cars.FirstOrDefault(c => c.Name == car.Name);
-            if (selectedCar.Command.Length > 0 )
+            if (selectedCar.Command.Length > 0 && !selectedCar.IsCollide)
             {
                 var cmd = selectedCar.Command[0];
 

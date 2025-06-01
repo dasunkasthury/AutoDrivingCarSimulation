@@ -14,6 +14,8 @@ namespace AutoDrivingCarSimulator.Infrastructure.Extensions
             services.AddSingleton<ISimulatorService, SimulatorService>();
             services.AddSingleton<ISimulatorRepository, SimulatorRepository>();
             services.AddAutoMapper(typeof(Program));
+            services.AddSingleton<AutoDrivingCarApp>();
+
 
             return services;
         }

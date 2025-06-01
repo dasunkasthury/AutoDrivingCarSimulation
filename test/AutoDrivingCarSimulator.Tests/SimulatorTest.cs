@@ -233,10 +233,4 @@ public class SimulatorTest
 
     }
 
-    public void GivenCarDetails_beyondBoundary_Validate_CarDestination(CarDto car, FieldDto field)
-    {
-
-
-    }
-
 }

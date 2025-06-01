@@ -1,0 +1,169 @@
+﻿using AutoDrivingCarSimulator.Core.DTO;
+using AutoDrivingCarSimulator.Core.Enums;
+using AutoDrivingCarSimulator.Core.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AutoDrivingCarSimulator
+{
+    public class AutoDrivingCarApp
+    {
+        private readonly ISimulatorService _simulatorService;
+
+        public AutoDrivingCarApp(ISimulatorService simulatorService) 
+        {
+            _simulatorService = simulatorService;
+        }
+        public void Begin()
+        {
+            Console.WriteLine("Welcome to Auto Driving Car Simulation!");
+            bool isValidField = true;
+            int width = 0;
+            int height = 0;
+            do
+            {
+                Console.WriteLine("Please enter the width and height of the simulation field in x y format:");
+
+                string[] coordinates = Console.ReadLine().Split(' ');
+                width = int.Parse(coordinates[0]);
+                height = int.Parse(coordinates[1]);
+                isValidField = _simulatorService.IsValidField(width, height);
+
+                if (!isValidField)
+                {
+                    Console.WriteLine("You have entered invalid width and height ");
+                }
+            } while (!isValidField);
+
+            // Initialize the simulation field
+            _simulatorService.AddField(width, height);
+
+            while (true)
+            {
+                Console.WriteLine($"You have created a field of {width} x {height}.");
+                Console.WriteLine("Please choose from the following options:");
+                Console.WriteLine("[1] Add a car to field");
+                Console.WriteLine("[2] Run simulation");
+
+                var input = Console.ReadLine()?.ToUpper();
+
+                switch (input)
+                {
+                    case "1":
+                        AddCar();
+                        break;
+                    case "2":
+                        Simulate();
+                        break;
+                    case "Q" or "q":
+                        Quit();
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        void AddCar()
+        {
+            bool isValidName = true;
+            string name = "";
+            bool isValidCar = true;
+            bool isValidCommand = true;
+            CarDto car;
+
+            do
+            {
+                Console.WriteLine("Please enter the name of the car:");
+                name = Console.ReadLine();
+
+                isValidName = _simulatorService.IsValidCarName(name);
+
+                if (!isValidName)
+                {
+                    Console.WriteLine("You have entered an invalid name");
+                }
+            } while (!isValidName);
+
+            do
+            {
+                Console.WriteLine($"Please enter initial position of car {name} in x y Direction format:");
+                string[] position = Console.ReadLine().Split(' ');
+                int x = int.Parse(position[0]);
+                int y = int.Parse(position[1]);
+                Direction direction = Enum.Parse<Direction>(position[2]);
+
+                car = new CarDto()
+                {
+                    Name = name,
+                    XCoordinate = x,
+                    YCoordinate = y,
+                    Direction = direction
+                };
+
+                isValidCar = _simulatorService.IsValidCar(car);
+
+                if (!isValidCar)
+                {
+                    Console.WriteLine("You have entered an invalid car details");
+                }
+            } while (!isValidCar);
+
+            do
+            {
+                Console.WriteLine($"Please enter the commands for car {name}:");
+                string command = Console.ReadLine();
+
+                isValidCommand = _simulatorService.IsValidCommand(command.ToUpper());
+
+                car.CommandList = command.ToUpper().Select(c => Enum.Parse<Command>(c.ToString())).ToList();
+
+                if (!isValidCommand)
+                {
+                    Console.WriteLine("You have entered an invalid command");
+                }
+
+            } while (!isValidCommand);
+
+            _simulatorService.AddCar(car);
+
+            Console.WriteLine("Your current list of cars are:");
+            foreach (var c in _simulatorService.GetAllCars())
+            {
+                Console.WriteLine($"- {c.Name}, ({c.XCoordinate},{c.YCoordinate}) {c.Direction}, {string.Join("", c.CommandList)}");
+            }
+        }
+
+        void Simulate()
+        {
+            Console.WriteLine("Your current list of cars are:");
+            foreach (var c in _simulatorService.GetAllCars())
+            {
+                Console.WriteLine($"- {c.Name}, ({c.XCoordinate},{c.YCoordinate}) {c.Direction}, {string.Join("", c.CommandList)}");
+            }
+
+            _simulatorService.FindDestination();
+
+            Console.WriteLine("After simulation, the result is:");
+            foreach (var result in _simulatorService.GetResults())
+            {
+                Console.WriteLine(result);
+            }
+
+            Console.WriteLine("Please choose from the following options:");
+            Console.WriteLine("[1] Start over");
+            Console.WriteLine("[2] Exit");
+
+        }
+
+        void Quit()
+        {
+            Console.WriteLine("Thank you for running the simulation. Goodbye!");
+        }
+
+    }
+}

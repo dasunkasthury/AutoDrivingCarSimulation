@@ -11,9 +11,11 @@ namespace AutoDrivingCarSimulator.Domain.Entity
         public required Direction Direction { get; set; }
         public string? Command { get; set; }
         public bool IsCollide { get; set; }
+        public int CompletedSteps { get; set; } = 0; 
 
         public void MoveForward(FieldDto field)
         {
+            CompletedSteps++;
             switch (Direction)
             {
                 case Direction.N:
@@ -33,6 +35,7 @@ namespace AutoDrivingCarSimulator.Domain.Entity
 
         public void TurnRight()
         {
+            CompletedSteps++;
             switch (Direction)
             {
                 case Direction.N:
@@ -53,6 +56,7 @@ namespace AutoDrivingCarSimulator.Domain.Entity
 
         public void TurnLeft()
         {
+            CompletedSteps++;
             switch (Direction)
             {
                 case Direction.N:

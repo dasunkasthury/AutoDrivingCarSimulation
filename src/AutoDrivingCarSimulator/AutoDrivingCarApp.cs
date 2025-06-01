@@ -150,7 +150,7 @@ namespace AutoDrivingCarSimulator
 
         void Simulate()
         {
-            if (!_simulatorService.IsAnyCarAvailable()) 
+            if (!_simulatorService.IsAnyCarAvailable()) // to avoid run simulation and print empty values with no car data
             {
                 Console.WriteLine("Please enter at least one car befor run simulation");
                 Begin();

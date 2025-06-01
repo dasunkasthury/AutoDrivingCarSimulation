@@ -29,6 +29,8 @@
 
 ## Design and Architecture
 
+![TDD Architecture Diagram](assets/TDD_architecture_diagram.png)
+
 - This system was designed using a Test-Driven Development (TDD) approach with C# and .NET-core framework. Unit tests were written first using xUnit to cover all core business logic, ensuring robustness and maintainability from the outset.
   -The following design principles and practices were followed along with SOLID during development:
 
@@ -45,7 +47,8 @@
 - FluentAssertions was used in unit testing to enable more readable and expressive assertions, enhancing the clarity and effectiveness of test result evaluations.
 - NSubstitute was utilized to mock dependencies during unit test development, allowing for isolated testing of components and ensuring accurate verification of interactions.
 - A dedicated test helper class was implemented within the unit test project to centralize the creation of mock data. This approach promotes reusability and consistency across multiple test cases.
-- ***
+
+![Designe Architecture Diagram](assets/architecture_diagram.png)
 
 ---
 
@@ -58,7 +61,7 @@
 
 ### Cloning Repository
 
-- Repository can be cloned using the following command or thought a thirdparty app like SourcrTree <pre> `git clone https://github.com/dasunkasthury/AutoDrivingCarSimulation.git cd AutoDrivingCarSimulation` </pre> <pre> `cd AutoDrivingCarSimulation` </pre>
+- Repository can be cloned using the following command or thought a thirdparty app like SourcrTree <pre> `git clone https://github.com/dasunkasthury/AutoDrivingCarSimulation.git` </pre> <pre> `cd AutoDrivingCarSimulation` </pre>
 
 ### Build the Project
 
@@ -67,6 +70,10 @@
 ### Run the Application
 
 - Use the following command or Visual Studio to run the project <pre> `dotnet run --project src/AutoDrivingCarSimulator` </pre>
+
+- Following is an example workflow
+
+![Designe Architecture Diagram](assets/sample.png)
 
 ---
 

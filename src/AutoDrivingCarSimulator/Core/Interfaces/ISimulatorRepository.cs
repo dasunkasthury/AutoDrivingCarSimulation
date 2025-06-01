@@ -11,10 +11,6 @@ namespace AutoDrivingCarSimulator.Core.Interfaces
 
         FieldDto GetField();
 
-        void RunCommand(CarDto car, FieldDto field);
-
-        void CheckCollision();
-
         IEnumerable<CarDto> GetCollidedCars();
 
         IEnumerable<CarDto> GetCompletedCars();
@@ -22,6 +18,10 @@ namespace AutoDrivingCarSimulator.Core.Interfaces
         void ClearData();
 
         IList<CarDto> GetAllCar();
+
+        IList<EntityCar> GetAllCarEntities();
+
+        void UpdateCarList (IEnumerable<EntityCar> cars);
 
     }
 }

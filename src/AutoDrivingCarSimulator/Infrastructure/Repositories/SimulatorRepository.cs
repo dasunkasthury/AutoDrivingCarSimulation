@@ -7,7 +7,7 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 {
     public class SimulatorRepository : ISimulatorRepository
     {
-        private readonly List<EntityCar> _cars = new(); // Fix for IDE0090: 'new' expression can be simplified
+        private List<EntityCar> _cars = new();
         private readonly IMapper _mapper;
         private EntityField _field;
 
@@ -26,19 +26,6 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
             _field = _mapper.Map<EntityField>(field);
         }
 
-        public void CheckCollision()
-        {
-            var isCollideCar = _cars.GroupBy(c => new { c.YCoordinate, c.XCoordinate }).Where(g => g.Count() > 1).Select(c => c.Key).ToList();
-
-            if (isCollideCar.Any())
-            {
-                foreach (var collideCar in _cars.Where(c => c.YCoordinate == isCollideCar[0].YCoordinate && c.XCoordinate == isCollideCar[0].XCoordinate).ToList())
-                {
-                    collideCar.IsCollide = true;
-                }
-            }
-        }
-
         public void ClearData()
         {
             throw new NotImplementedException();
@@ -46,8 +33,12 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
 
         public IList<CarDto> GetAllCar()
         {
-            var cars = _mapper.Map<List<CarDto>>(_cars);
-            return cars;
+            return _mapper.Map<List<CarDto>>(_cars);
+        }
+
+        public IList<EntityCar> GetAllCarEntities()
+        {
+            return _cars;
         }
 
         public IEnumerable<CarDto> GetCollidedCars()
@@ -65,31 +56,9 @@ namespace AutoDrivingCarSimulator.Infrastructure.Repositories
             return _mapper.Map<FieldDto>(_field);
         }
 
-        public void RunCommand(CarDto car, FieldDto field)
+        public void UpdateCarList(IEnumerable<EntityCar> cars)
         {
-            var selectedCar = _cars.FirstOrDefault(c => c.Name == car.Name);
-            if (selectedCar.Command.Length > 0 && !selectedCar.IsCollide)
-            {
-                var cmd = selectedCar.Command[0];
-
-                selectedCar.Command = selectedCar.Command.Substring(1);// Remove the executed commands to avoid getting execute them again
-
-                switch (cmd)
-                {
-                    case 'L':
-                        // Logic to turn left
-                        selectedCar.TurnLeft();
-                        break;
-                    case 'R':
-                        // Logic to turn right
-                        selectedCar.TurnRight();
-                        break;
-                    case 'F':
-                        // Logic to move forward
-                        selectedCar.MoveForward(field);
-                        break;
-                }
-            }
+            _cars = cars.ToList();
         }
     }
 }

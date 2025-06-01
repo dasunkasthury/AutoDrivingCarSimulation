@@ -1,9 +1,13 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
 using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Interfaces;
+using AutoDrivingCarSimulator.Core.Profiles;
 using AutoDrivingCarSimulator.Core.Services.Concretes;
+using AutoDrivingCarSimulator.Domain.Entity;
+using AutoDrivingCarSimulator.Infrastructure.Repositories;
 using AutoDrivingCarSimulator.Tests.Helpers;
 using AutoFixture.Xunit2;
+using AutoMapper;
 using FluentAssertions;
 using NSubstitute;
 using System.Xml.Linq;
@@ -154,24 +158,6 @@ public class SimulatorTest
         Assert.Equal(car.Direction, res[0].Direction);
     }
 
-    [Theory, InlineAutoData("A", 0, 1, Direction.W, "FFLLR", 10, 10)]
-    public void GivenCarDetails_Validate_CarDestination(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
-    {
-        // Arrange
-        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
-        var simulator = Substitute.For<ISimulatorRepository>();
-        simulator.GetAllCar().Returns(new List<CarDto> { SimulatorServiceHelper.GetCar(name, xCord, yCord, direction, command) });
-        simulator.GetField().Returns(new FieldDto { Height = fieldHeight, Width = fieldWidth });
-        var slut = new SimulatorService(simulator);
-        slut.FindDestination();
-
-        //Act
-        var res = slut.GetAllCars();
-
-        //Assertion
-        Assert.Single(res);
-    }
-
     [Theory]
     [InlineAutoData("A", 0, 1, Direction.W, "FFLLR")]
     [InlineAutoData("B", 5, 8, Direction.N, "FF")]
@@ -231,6 +217,151 @@ public class SimulatorTest
     {
 
 
+    }
+
+    [Theory, InlineAutoData("A", 5, 1, Direction.W, "F", 10, 10)]
+    public void GivenCarCommandForword_Validate_carMoveForword(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
+    {
+        // Arrange
+        var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+        var carList = new List<EntityCar> { SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, direction, command, false) };
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+
+        var slut = new SimulatorService(simulatorRepo);
+        //slut.AddCar(car);
+
+        //Act
+        var res = slut.CalculateDestination(field, carList);
+
+        //Assertion
+        Assert.Single(res);
+        Assert.Equal(xCord - 1, res[0].XCoordinate);
+        Assert.Equal(yCord, res[0].YCoordinate);
+        Assert.Equal(direction, res[0].Direction);
+    }
+
+    [Theory, InlineAutoData("A", 5, 1, Direction.W, "F", 10, 10)]
+    public void GivenCarCommand_Validate_increaseStepCount(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
+    {
+        // Arrange
+        var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+        var carList = new List<EntityCar> { SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, direction, command, false) };
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+        var slut = new SimulatorService(simulatorRepo);
+
+        //Act
+        var res = slut.CalculateDestination(field, carList);
+
+        //Assertion
+        res.Should().HaveCount(1);
+        res.First().CompletedSteps.Should().Be(1);
+    }
+
+    [Theory]
+    [InlineAutoData("A", 0, 0, Direction.N, "F", 10, 10)]
+    [InlineAutoData("B", 5, 7, Direction.N, "F", 10, 10)]
+    public void GivenCarCollided_validate_carShouldNotMove(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
+    {
+        // Arrange
+        var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+        var carList = new List<EntityCar> { SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, direction, command, true) };
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+        var slut = new SimulatorService(simulatorRepo);
+
+        //Act
+        var res = slut.CalculateDestination(field, carList);
+
+        //Assertion
+        res.Should().HaveCount(1);
+        res.First().XCoordinate.Should().Be(xCord);
+        res.First().YCoordinate.Should().Be(yCord);
+    }
+
+    [Theory]
+    [InlineAutoData("A", 0, 0, Direction.W, "FFFF")]
+    [InlineAutoData("B", 0, 0, Direction.W, "FFFFFF")]
+    public void GivenCars_validate_collision(string name, int xCord, int yCord, Direction Direction, string command)
+    {
+        // Arrange
+        var car1 = SimulatorServiceHelper.GetEntityCar("B", 0, 0, Direction.E, "FFFFFFFF", false);
+        var car2 = SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, Direction, command, false);
+        var carList = new List<EntityCar> { car1, car2 };
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+        var slut = new SimulatorService(simulatorRepo);
+
+        //Act
+        slut.CheckCollision(carList);
+        var res = carList;
+
+        //Assertion
+        res.Should().HaveCount(2);
+        res.Should().OnlyContain(c => c.IsCollide);
+    }
+
+    [Theory, InlineAutoData("A", 0, 0, Direction.N, "R", 10, 10)]
+    public void GivenCarCommandTurnRight_Validate_carTurnRight(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
+    {
+        // Arrange
+        var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+        var carList = new List<EntityCar> { SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, direction, command, false) };
+
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+
+        var slut = new SimulatorService(simulatorRepo);
+        //slut.AddCar(car);
+
+        //Act
+        var res = slut.CalculateDestination(field, carList);
+
+        //Assertion
+        Assert.Single(res);
+        Assert.Equal(xCord, res[0].XCoordinate);
+        Assert.Equal(yCord, res[0].YCoordinate);
+        Assert.Equal(Direction.E, res[0].Direction);
+    }
+
+    [Theory, InlineAutoData("A", 0, 0, Direction.N, "L", 10, 10)]
+    public void GivenCarCommandTurnLeft_Validate_carTurnLeft(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
+    {
+        // Arrange
+        var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+        var carList = new List<EntityCar> { SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, direction, command, false) };
+
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+
+        var slut = new SimulatorService(simulatorRepo);
+        //slut.AddCar(car);
+
+        //Act
+        var res = slut.CalculateDestination(field, carList);
+
+        //Assertion
+        Assert.Single(res);
+        Assert.Equal(xCord, res[0].XCoordinate);
+        Assert.Equal(yCord, res[0].YCoordinate);
+        Assert.Equal(Direction.W, res[0].Direction);
+    }
+
+    [Theory, InlineAutoData("A", 0, 0, Direction.E, "FFLFFLFRFF", 10, 10)]
+    public void GivenCarCommand_Validate_carDestination(string name, int xCord, int yCord, Direction direction, string command, int fieldWidth, int fieldHeight)
+    {
+        // Arrange
+        var field = new FieldDto { Height = fieldHeight, Width = fieldWidth };
+        var carList = new List<EntityCar> { SimulatorServiceHelper.GetEntityCar(name, xCord, yCord, direction, command, false) };
+
+        var simulatorRepo = Substitute.For<ISimulatorRepository>();
+
+        var slut = new SimulatorService(simulatorRepo);
+        //slut.AddCar(car);
+
+        //Act
+        var res = slut.CalculateDestination(field, carList);
+
+        //Assertion
+        Assert.Single(res);
+        Assert.Equal(1, res[0].XCoordinate);
+        Assert.Equal(4, res[0].YCoordinate);
+        Assert.Equal(Direction.N, res[0].Direction);
     }
 
 }

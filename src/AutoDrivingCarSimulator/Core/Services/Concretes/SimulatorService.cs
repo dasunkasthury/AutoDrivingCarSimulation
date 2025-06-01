@@ -1,6 +1,6 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
 using AutoDrivingCarSimulator.Core.Interfaces;
-using AutoDrivingCarSimulator.Infrastructure.Repositories;
+using AutoDrivingCarSimulator.Domain.Entity;
 
 namespace AutoDrivingCarSimulator.Core.Services.Concretes
 {
@@ -23,23 +23,65 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
             _simulatorRepository.AddField(new FieldDto { Height = height, Width = width });
         }
 
-        public void FindDestination()
-        {
-            var field = _simulatorRepository.GetField();
 
+        public IList<EntityCar> CalculateDestination(FieldDto field, IList<EntityCar> CarEntityList)
+        {
             bool hasMoreCommands = true;
             do
             {
-                var carList = _simulatorRepository.GetAllCar();
-
-                foreach (var car in carList)
+                foreach (var car in CarEntityList)
                 {
-                    _simulatorRepository.RunCommand(car, field); // to execute the commands one by one to earch car
-                    _simulatorRepository.CheckCollision(); // Check for collisions before running next commands
+                    if (car.Command.Length > 0 && !car.IsCollide)
+                    {
+                        var cmd = car.Command[0]; // Assuming Command is a string of commands like "LFRF"
+
+                        car.Command = car.Command.Substring(1);// Remove the first command to process it
+
+                        switch (cmd)
+                        {
+                            case 'L':
+                                // Logic to turn left
+                                car.TurnLeft();
+                                break;
+                            case 'R':
+                                // Logic to turn right
+                                car.TurnRight();
+                                break;
+                            case 'F':
+                                // Logic to move forward
+                                car.MoveForward(field);
+                                break;
+                        }
+                    }
+                    CheckCollision(CarEntityList);
                 }
-                hasMoreCommands = carList.Any(c => c.CommandList.Count > 0 && !c.IsCollide); // Check if any car which is not collided and has commands left
+                hasMoreCommands = CarEntityList.Any(c => c.Command.Length > 0 && !c.IsCollide); // Check if any car which is not collided and has commands left
 
             } while (hasMoreCommands);
+
+            return CarEntityList;
+        }
+
+
+        public void FindDestination()
+        {
+            var field = _simulatorRepository.GetField();
+            var carList = _simulatorRepository.GetAllCarEntities();
+            var calculatedCarList = CalculateDestination(field, carList);
+            _simulatorRepository.UpdateCarList(calculatedCarList);
+        }
+
+        public void CheckCollision(IList<EntityCar> carList)
+        {
+            var isCollideCar = carList.GroupBy(c => new { c.YCoordinate, c.XCoordinate }).Where(g => g.Count() > 1).Select(c => c.Key).ToList();
+
+            if (isCollideCar.Any())
+            {
+                foreach (var collideCar in carList.Where(c => c.YCoordinate == isCollideCar[0].YCoordinate && c.XCoordinate == isCollideCar[0].XCoordinate).ToList())
+                {
+                    collideCar.IsCollide = true;
+                }
+            }
         }
 
         public IList<CarDto> GetAllCars()

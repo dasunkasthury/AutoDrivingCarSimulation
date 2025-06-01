@@ -1,11 +1,6 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
 using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AutoDrivingCarSimulator
 {
@@ -13,7 +8,7 @@ namespace AutoDrivingCarSimulator
     {
         private readonly ISimulatorService _simulatorService;
 
-        public AutoDrivingCarApp(ISimulatorService simulatorService) 
+        public AutoDrivingCarApp(ISimulatorService simulatorService)
         {
             _simulatorService = simulatorService;
         }

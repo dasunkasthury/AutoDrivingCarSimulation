@@ -15,7 +15,7 @@ namespace AutoDrivingCarSimulator.Domain.Entity
 
         public void MoveForward(FieldDto field)
         {
-            CompletedSteps++;
+            CompletedSteps++; // to update the step count after each command execution
             switch (Direction)
             {
                 case Direction.N:

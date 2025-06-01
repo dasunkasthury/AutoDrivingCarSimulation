@@ -6,7 +6,7 @@ using AutoFixture.Xunit2;
 using AutoMapper;
 using FluentAssertions;
 
-namespace AutoDrivingCarSimulator.Tests
+namespace AutoDrivingCarSimulator.Tests.Repositories
 {
     public class SimulatorRepositoryTest
     {
@@ -26,8 +26,8 @@ namespace AutoDrivingCarSimulator.Tests
             var res = slut.GetCompletedCars();
 
             //Assertion
-            Assert.Single(res);
-            Assert.False(res.First().IsCollide);
+            res.Should().HaveCount(1);
+            res.First().IsCollide.Should().BeFalse();
         }
 
         [Theory, InlineAutoData("A", 0, 0, Direction.N, "R")]

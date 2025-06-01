@@ -1,5 +1,4 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
-using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Interfaces;
 using AutoDrivingCarSimulator.Domain.Entity;
 
@@ -25,7 +24,7 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
         }
 
 
-        public IList<EntityCar> CalculateDestination(FieldDto field, IList<EntityCar> CarEntityList)
+        public IList<EntityCar> CalculateDestination(FieldDto field, IList<EntityCar> CarEntityList) // this is calculating the destination by going through all the commands for each car
         {
             bool hasMoreCommands = true;
             do
@@ -34,9 +33,9 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
                 {
                     if (car.Command.Length > 0 && !car.IsCollide)
                     {
-                        var cmd = car.Command[0]; // Assuming Command is a string of commands like "LFRF"
+                        var cmd = car.Command[0]; // this is the next command to be executed for each car
 
-                        car.Command = car.Command.Substring(1);// Remove the first command to process it
+                        car.Command = car.Command.Substring(1);// Remove the first command. this is to avoid getting execute this command again.  
 
                         switch (cmd)
                         {
@@ -54,7 +53,7 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
                                 break;
                         }
                     }
-                    CheckCollision(CarEntityList);
+                    CheckCollision(CarEntityList); // this is to check for the collisions after executing each command for each car. This is to determind the collition ASAP
                 }
                 hasMoreCommands = CarEntityList.Any(c => c.Command.Length > 0 && !c.IsCollide); // Check if any car which is not collided and has commands left
 
@@ -64,7 +63,7 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
         }
 
 
-        public void UpdateDestination()
+        public void UpdateDestination() // this is responsible to codinate the command execution and update the results using infrastracture layer
         {
             var field = _simulatorRepository.GetField();
             var carList = _simulatorRepository.GetAllCarEntities();
@@ -74,11 +73,11 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
 
         public void CheckCollision(IList<EntityCar> carList)
         {
-            var isCollideCar = carList.GroupBy(c => new { c.YCoordinate, c.XCoordinate }).Where(g => g.Count() > 1).Select(c => c.Key).ToList();
+            var isCollideCar = carList.GroupBy(c => new { c.YCoordinate, c.XCoordinate }).Where(g => g.Count() > 1).Select(c => c.Key).ToList(); // to check whether is there any multiple cars with the same cordinates
 
             if (isCollideCar.Any())
             {
-                foreach (var collideCar in carList.Where(c => c.YCoordinate == isCollideCar[0].YCoordinate && c.XCoordinate == isCollideCar[0].XCoordinate).ToList())
+                foreach (var collideCar in carList.Where(c => c.YCoordinate == isCollideCar[0].YCoordinate && c.XCoordinate == isCollideCar[0].XCoordinate).ToList()) // this is to update every car that has been collided
                 {
                     collideCar.IsCollide = true;
                 }
@@ -91,7 +90,7 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
             return existingCar;
         }
 
-        public IEnumerable<string> GetResults()
+        public IEnumerable<string> GetResults() // this is to get the final results considering both completed and collided cars
         {
             IList<string> result = new List<string>();
             var completedCarList = _simulatorRepository.GetCompletedCars();
@@ -142,7 +141,7 @@ namespace AutoDrivingCarSimulator.Core.Services.Concretes
 
         public bool IsAnyCarAvailable()
         {
-           return _simulatorRepository.GetAllCar().Any();
+            return _simulatorRepository.GetAllCar().Any();
         }
     }
 }

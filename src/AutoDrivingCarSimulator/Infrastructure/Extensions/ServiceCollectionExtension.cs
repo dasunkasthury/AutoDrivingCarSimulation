@@ -11,11 +11,11 @@ namespace AutoDrivingCarSimulator.Infrastructure.Extensions
         public static IServiceCollection ConfigureServices(this IServiceCollection services)
         {
             // Register repositories
+            // use singleton since no session data is required and it is fine to generate dependencies one time 
             services.AddSingleton<ISimulatorService, SimulatorService>();
             services.AddSingleton<ISimulatorRepository, SimulatorRepository>();
             services.AddAutoMapper(typeof(Program));
             services.AddSingleton<AutoDrivingCarApp>();
-
 
             return services;
         }

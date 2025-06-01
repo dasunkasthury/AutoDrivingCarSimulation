@@ -2,8 +2,9 @@
 using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Profiles;
 using AutoMapper;
+using FluentAssertions;
 
-namespace AutoDrivingCarSimulator.Tests
+namespace AutoDrivingCarSimulator.Tests.Profiles
 {
     public class ProfileTest
     {
@@ -19,10 +20,10 @@ namespace AutoDrivingCarSimulator.Tests
             var dest = mapper.Map<CarDto>(src);
 
             //Assertion
-            Assert.Equal(dest.Name, src.Name);
-            Assert.Equal(dest.XCoordinate, src.XCoordinate);
-            Assert.Equal(dest.YCoordinate, src.YCoordinate);
-            Assert.Equal(dest.Direction, src.Direction);
+            dest.Name.Should().Be(src.Name);
+            dest.XCoordinate.Should().Be(src.XCoordinate);
+            dest.YCoordinate.Should().Be(src.YCoordinate);
+            dest.Direction.Should().Be(src.Direction);
         }
 
         [Fact]
@@ -37,8 +38,8 @@ namespace AutoDrivingCarSimulator.Tests
             var dest = mapper.Map<FieldDto>(src);
 
             //Assertion
-            Assert.Equal(dest.Height, src.Height);
-            Assert.Equal(dest.Width, src.Width);
+            dest.Height.Should().Be(src.Height);
+            dest.Width.Should().Be(src.Width);
         }
     }
 }

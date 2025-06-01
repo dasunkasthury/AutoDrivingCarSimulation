@@ -1,21 +1,16 @@
 ﻿using AutoDrivingCarSimulator.Core.DTO;
 using AutoDrivingCarSimulator.Core.Enums;
 using AutoDrivingCarSimulator.Core.Interfaces;
-using AutoDrivingCarSimulator.Core.Profiles;
 using AutoDrivingCarSimulator.Core.Services.Concretes;
 using AutoDrivingCarSimulator.Domain.Entity;
-using AutoDrivingCarSimulator.Infrastructure.Repositories;
 using AutoDrivingCarSimulator.Tests.Helpers;
 using AutoFixture.Xunit2;
-using AutoMapper;
 using FluentAssertions;
 using NSubstitute;
-using System.Xml.Linq;
-using Xunit;
 
-namespace AutoDrivingCarSimulator.Tests;
+namespace AutoDrivingCarSimulator.Tests.Services;
 
-public class SimulatorTest
+public class SimulatorServiceTest
 {
     [Theory, InlineAutoData(5, 10)]
     public void GivenFieldCoordinates_Validate_Coordinates(int width, int height)
@@ -45,11 +40,11 @@ public class SimulatorTest
         res.Should().BeFalse("because this field has no width");
     }
 
-    [Theory, InlineAutoData("A",0,2,Direction.W)]
+    [Theory, InlineAutoData("A", 0, 2, Direction.W)]
     public void GivenCarDetails_Validate_CarDetails(string name, int xCord, int yCord, Direction direction)
     {
         // Arrange
-        var car = new CarDto { Name= name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
+        var car = new CarDto { Name = name, XCoordinate = xCord, YCoordinate = yCord, Direction = direction };
         var simulator = Substitute.For<ISimulatorRepository>();
         var slut = new SimulatorService(simulator);
 
@@ -151,11 +146,11 @@ public class SimulatorTest
         var res = slut.GetAllCars();
 
         //Assertion
-        Assert.Single(res);
-        Assert.Equal(car.Name, res[0].Name);
-        Assert.Equal(car.XCoordinate, res[0].XCoordinate);
-        Assert.Equal(car.YCoordinate, res[0].YCoordinate);
-        Assert.Equal(car.Direction, res[0].Direction);
+        res.Should().HaveCount(1);
+        res.First().Name.Should().Be(car.Name);
+        res.First().XCoordinate.Should().Be(car.XCoordinate);
+        res.First().YCoordinate.Should().Be(car.YCoordinate);
+        res.First().Direction.Should().Be(car.Direction);
     }
 
     [Theory]
@@ -176,7 +171,7 @@ public class SimulatorTest
         //Assertion
         res.Should().NotBeNull();
         res.Should().HaveCount(1);
-        res.Should().Contain(x=>x.Equals($"{name}, ({xCord},{yCord})  {direction}"));
+        res.Should().Contain(x => x.Equals($"{name}, ({xCord},{yCord})  {direction}"));
     }
 
     [Theory]
@@ -228,16 +223,15 @@ public class SimulatorTest
         var simulatorRepo = Substitute.For<ISimulatorRepository>();
 
         var slut = new SimulatorService(simulatorRepo);
-        //slut.AddCar(car);
 
         //Act
         var res = slut.CalculateDestination(field, carList);
 
         //Assertion
-        Assert.Single(res);
-        Assert.Equal(xCord - 1, res[0].XCoordinate);
-        Assert.Equal(yCord, res[0].YCoordinate);
-        Assert.Equal(direction, res[0].Direction);
+        res.Should().HaveCount(1);
+        res.First().XCoordinate.Should().Be(xCord - 1);
+        res.First().YCoordinate.Should().Be(yCord);
+        res.First().Direction.Should().Be(direction);
     }
 
     [Theory, InlineAutoData("A", 5, 1, Direction.W, "F", 10, 10)]
@@ -314,10 +308,10 @@ public class SimulatorTest
         var res = slut.CalculateDestination(field, carList);
 
         //Assertion
-        Assert.Single(res);
-        Assert.Equal(xCord, res[0].XCoordinate);
-        Assert.Equal(yCord, res[0].YCoordinate);
-        Assert.Equal(Direction.E, res[0].Direction);
+        res.Should().HaveCount(1);
+        res.First().XCoordinate.Should().Be(xCord);
+        res.First().YCoordinate.Should().Be(yCord);
+        res.First().Direction.Should().Be(Direction.E);
     }
 
     [Theory, InlineAutoData("A", 0, 0, Direction.N, "L", 10, 10)]
@@ -336,10 +330,10 @@ public class SimulatorTest
         var res = slut.CalculateDestination(field, carList);
 
         //Assertion
-        Assert.Single(res);
-        Assert.Equal(xCord, res[0].XCoordinate);
-        Assert.Equal(yCord, res[0].YCoordinate);
-        Assert.Equal(Direction.W, res[0].Direction);
+        res.Should().HaveCount(1);
+        res.First().XCoordinate.Should().Be(xCord);
+        res.First().YCoordinate.Should().Be(yCord);
+        res.First().Direction.Should().Be(Direction.W);
     }
 
     [Theory, InlineAutoData("A", 0, 0, Direction.E, "FFLFFLFRFF", 10, 10)]
@@ -358,10 +352,10 @@ public class SimulatorTest
         var res = slut.CalculateDestination(field, carList);
 
         //Assertion
-        Assert.Single(res);
-        Assert.Equal(1, res[0].XCoordinate);
-        Assert.Equal(4, res[0].YCoordinate);
-        Assert.Equal(Direction.N, res[0].Direction);
+        res.Should().HaveCount(1);
+        res.First().XCoordinate.Should().Be(1);
+        res.First().YCoordinate.Should().Be(4);
+        res.First().Direction.Should().Be(Direction.N);
     }
 
 }

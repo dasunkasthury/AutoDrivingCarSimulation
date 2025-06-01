@@ -8,10 +8,10 @@
 
 ## Table of Contents
 
-- [What is Auto Driving Car Simulation ?](#what-is-auto-driving-car-simulation)
+- [What is Auto Driving Car Simulation](#what-is-auto-driving-car-simulation)
 - [Design and Architecture](#what-is-auto-driving-car-simulation)
 - [How to Setup](#how-to-setup)
-- [How it Works ?](#how-it-works)
+- [How it Works](#how-it-works)
 - [Usage](#usage)
 - [Testing](#testing)
 - [What is next](#what-is-next)
